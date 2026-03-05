@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Portfolio Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>ADMIN</h1>
+                <a href="index.html" target="_blank" class="preview-btn">사이트 보기 ↗</a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#profile" class="nav-item active" data-section="profile">
+                    <span class="icon">👤</span> 프로필
+                </a>
+                <a href="#hero" class="nav-item" data-section="hero">
+                    <span class="icon">🎬</span> 히어로 슬라이더
+                </a>
+                <a href="#works" class="nav-item" data-section="works">
+                    <span class="icon">🎬</span> Works
+                </a>
+                <a href="#stats" class="nav-item" data-section="stats">
+                    <span class="icon">📊</span> 통계
+                </a>
+                <a href="#contact" class="nav-item" data-section="contact">
+                    <span class="icon">📧</span> 연락처
+                </a>
+                <a href="#together" class="nav-item" data-section="together">
+                    <span class="icon">👥</span> 함께하는 사람들
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <span class="icon">⚙️</span> 사이트 설정
+                </a>
+                <a href="#channels" class="nav-item" data-section="channels">
+                    <span class="icon">📺</span> YouTube
+                </a>
+                <a href="#hero-content" class="nav-item" data-section="hero-content">
+                    <span class="icon">🎨</span> 히어로 콘텐츠
+                </a>
+                <a href="#typography" class="nav-item" data-section="typography">
+                    <span class="icon">✏️</span> 타이포그래피
+                </a>
+                <a href="#visitors" class="nav-item" data-section="visitors">
+                    <span class="icon">👁️</span> 방문기록
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-deploy" onclick="AdminPanel.exportForDeploy()">🚀 배포용 내보내기</button>
+                <button class="btn-sync" onclick="AdminPanel.syncFilePaths()" title="이미지 경로를 실제 파일과 동기화">🔄 파일 동기화</button>
+                <button class="btn-export" onclick="AdminPanel.exportData()">데이터 내보내기</button>
+                <button class="btn-import" onclick="document.getElementById('import-file').click()">데이터 가져오기</button>
+                <input type="file" id="import-file" accept=".json" style="display:none" onchange="AdminPanel.importData(this)">
+                <button class="btn-reset" onclick="AdminPanel.resetData()">초기화</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Profile Section -->
+            <section id="profile" class="admin-section active">
+                <div class="section-header">
+                    <h2>프로필 관리</h2>
+                    <button class="btn-save" onclick="AdminPanel.saveProfile()">저장</button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>이름</label>
+                        <input type="text" id="profile-name" placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label>영문 이름</label>
+                        <input type="text" id="profile-nameEn" placeholder="Hong Gildong">
+                    </div>
+                    <div class="form-group">
+                        <label>직함 / 역할</label>
+                        <input type="text" id="profile-role" placeholder="Video Creator / Motion Designer">
+                    </div>
+                    <div class="form-group">
+                        <label>위치</label>
+                        <input type="text" id="profile-location" placeholder="Seoul, South Korea">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>프로필 이미지</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="profile-image" placeholder="assets/images/profile.jpg">
+                            <label class="btn-upload">
+                                파일 선택
+                                <input type="file" accept="image/*" onchange="AdminPanel.handleFileUpload(this, 'profile-image', 'images')">
+                            </label>
+                        </div>
+                        <div class="image-preview" id="profile-image-preview"></div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>자기소개 (줄바꿈으로 단락 구분)</label>
+                        <textarea id="profile-description" rows="5" placeholder="자기소개를 입력하세요..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>스킬 (쉼표로 구분)</label>
+                        <input type="text" id="profile-skills" placeholder="Premiere Pro, After Effects, DaVinci Resolve">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hero Section -->
+            <section id="hero" class="admin-section">
+                <div class="section-header">
+                    <h2>히어로 슬라이더 관리</h2>
+                    <button class="btn-add" onclick="AdminPanel.addHeroSlide()">+ 슬라이드 추가</button>
+                </div>
+                <div class="slides-list" id="hero-slides-list">
+                    <!-- 동적으로 생성 -->
+                </div>
+            </section>
+
+            <!-- Works Section -->
+            <section id="works" class="admin-section">
+                <div class="section-header">
+                    <h2>Works 관리</h2>
+                    <p class="section-desc">외주 작업, 홍보영상, 클래스 영상 등 카테고리별 하이라이트 클립</p>
+                    <button class="btn-add" onclick="AdminPanel.showWorkModal()">+ 작품 추가</button>
+                </div>
+                <div class="works-grid" id="works-list">
+                    <!-- 동적으로 생성 -->
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section id="stats" class="admin-section">
+                <div class="section-header">
+                    <h2>통계 관리</h2>
+                    <button class="btn-save" onclick="AdminPanel.saveStats()">저장</button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>프로젝트 수</label>
+                        <input type="number" id="stats-projects" placeholder="50">
+                    </div>
+                    <div class="form-group">
+                        <label>클라이언트 수</label>
+                        <input type="number" id="stats-clients" placeholder="30">
+                    </div>
+                    <div class="form-group">
+                        <label>경력 연수</label>
+                        <input type="number" id="stats-years" placeholder="5">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="admin-section">
+                <div class="section-header">
+                    <h2>연락처 관리</h2>
+                    <button class="btn-save" onclick="AdminPanel.saveContact()">저장</button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>이메일</label>
+                        <input type="email" id="contact-email" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>전화번호</label>
+                        <input type="tel" id="contact-phone" placeholder="010-1234-5678">
+                    </div>
+                    <div class="form-group">
+                        <label>YouTube URL</label>
+                        <input type="url" id="contact-youtube" placeholder="https://youtube.com/@channel">
+                    </div>
+                    <div class="form-group">
+                        <label>Instagram URL</label>
+                        <input type="url" id="contact-instagram" placeholder="https://instagram.com/username">
+                    </div>
+                    <div class="form-group">
+                        <label>Vimeo URL</label>
+                        <input type="url" id="contact-vimeo" placeholder="https://vimeo.com/username">
+                    </div>
+                    <div class="form-group">
+                        <label>Behance URL</label>
+                        <input type="url" id="contact-behance" placeholder="https://behance.net/username">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Together Section -->
+            <section id="together" class="admin-section">
+                <div class="section-header">
+                    <h2>함께하는 사람들 (TOGETHER)</h2>
+                    <div class="header-actions">
+                        <button class="btn-add" onclick="AdminPanel.addTogetherMember()">+ 멤버 추가</button>
+                        <button class="btn-save" onclick="AdminPanel.saveTogether()">저장</button>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>섹션 소개글</label>
+                    <input type="text" id="together-intro" placeholder="함께하는 크리에이터들을 소개합니다.">
+                </div>
+                <div id="together-members-list" class="together-members-admin">
+                    <!-- 동적으로 생성 -->
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="admin-section">
+                <div class="section-header">
+                    <h2>사이트 설정</h2>
+                    <button class="btn-save" onclick="AdminPanel.saveSettings()">저장</button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>사이트 이름</label>
+                        <input type="text" id="settings-siteName" placeholder="PORTFOLIO">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>히어로 타이틀 (줄바꿈으로 구분)</label>
+                        <textarea id="settings-heroTitle" rows="3" placeholder="CREATIVE&#10;VISUAL&#10;STORYTELLER"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>히어로 서브타이틀</label>
+                        <input type="text" id="settings-heroSubtitle" placeholder="영상으로 이야기를 전하는 크리에이터">
+                    </div>
+                    <div class="form-group">
+                        <label>쇼릴 비디오 URL</label>
+                        <input type="text" id="settings-showreelUrl" placeholder="assets/videos/showreel.mp4">
+                    </div>
+                    <div class="form-group">
+                        <label>쇼릴 타이틀</label>
+                        <input type="text" id="settings-showreelTitle" placeholder="SHOWREEL 2024">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>푸터 텍스트</label>
+                        <input type="text" id="settings-footerText" placeholder="© 2024 Your Name. All rights reserved.">
+                    </div>
+                </div>
+
+                <div class="section-header" style="margin-top: 40px;">
+                    <h3>카테고리 관리</h3>
+                    <button class="btn-add" onclick="AdminPanel.addCategory()">+ 카테고리 추가</button>
+                </div>
+                <div class="categories-list" id="categories-list">
+                    <!-- 동적으로 생성 -->
+                </div>
+            </section>
+
+            <!-- YouTube Section -->
+            <section id="channels" class="admin-section">
+                <div class="section-header">
+                    <h2>YouTube 관리</h2>
+                    <p class="section-desc">유튜브 채널 영상 관리</p>
+                    <button class="btn-add" onclick="AdminPanel.showChannelModal()">+ 채널 추가</button>
+                </div>
+
+                <!-- 채널 설정 -->
+                <div class="subsection">
+                    <h3>YouTube 설정</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>자동 슬라이드 간격 (ms)</label>
+                            <input type="number" id="channel-autoSlideInterval" value="3000" min="1000" max="10000" step="500">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="channel-showVideoCount" checked> 비디오 개수 표시
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn-save" onclick="AdminPanel.saveChannelSettings()">설정 저장</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 채널 목록 -->
+                <div class="channels-admin-list" id="channels-admin-list">
+                    <!-- 동적으로 생성 -->
+                </div>
+            </section>
+
+            <!-- Hero Content Section -->
+            <section id="hero-content" class="admin-section">
+                <div class="section-header">
+                    <h2>히어로 콘텐츠 설정</h2>
+                    <button class="btn-save" onclick="AdminPanel.saveHeroContentSettings()">저장</button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>배경 타입</label>
+                        <select id="hero-content-bgType" onchange="AdminPanel.toggleHeroContentBg()">
+                            <option value="none">없음 (단색 배경)</option>
+                            <option value="video">비디오</option>
+                            <option value="image">이미지</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>오버레이 투명도</label>
+                        <input type="range" id="hero-content-overlay" min="0" max="100" value="80" oninput="AdminPanel.updateOverlayPreview()">
+                        <span id="hero-content-overlay-value">80%</span>
+                    </div>
+                    <div class="form-group full-width" id="hero-content-src-group" style="display:none;">
+                        <label>배경 소스</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="hero-content-src" placeholder="assets/videos/bg.mp4">
+                            <label class="btn-upload">
+                                파일 선택
+                                <input type="file" accept="video/*,image/*" onchange="AdminPanel.handleFileUpload(this, 'hero-content-src', 'auto')">
+                            </label>
+                        </div>
+                        <div class="image-preview" id="hero-content-src-preview"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>타이틀 효과</label>
+                        <select id="hero-content-effect">
+                            <option value="none">없음</option>
+                            <option value="glow">글로우 (Glow)</option>
+                            <option value="gradient">그라데이션 스윕</option>
+                            <option value="shadow">3D 그림자</option>
+                            <option value="outline">아웃라인</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 미리보기 -->
+                <div class="section-header" style="margin-top: 40px;">
+                    <h3>미리보기</h3>
+                    <button class="btn-add" onclick="AdminPanel.previewHeroContent()">미리보기 업데이트</button>
+                </div>
+                <div class="preview-box" id="hero-content-preview">
+                    <div class="preview-bg" id="preview-hero-bg"></div>
+                    <div class="preview-overlay" id="preview-hero-overlay"></div>
+                    <div class="preview-content">
+                        <h1 class="preview-title" id="preview-hero-title">CREATIVE<br>VISUAL<br>STORYTELLER</h1>
+                        <p class="preview-subtitle" id="preview-hero-subtitle">영상으로 이야기를 전하는 크리에이터</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Typography Section -->
+            <section id="typography" class="admin-section">
+                <div class="section-header">
+                    <h2>타이포그래피 설정</h2>
+                    <button class="btn-save" onclick="AdminPanel.saveTypography()">저장</button>
+                </div>
+
+                <!-- Hero Title Typography -->
+                <div class="typography-group">
+                    <h3>히어로 타이틀</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>폰트</label>
+                            <select id="typo-hero-font" onchange="AdminPanel.updateTypographyPreview()">
+                                <option value="'Bebas Neue', 'Montserrat', sans-serif">Bebas Neue</option>
+                                <option value="'Montserrat', sans-serif">Montserrat</option>
+                                <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+                                <option value="'Rocket', 'Noto Sans KR', sans-serif">로케트체</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>크기 (rem)</label>
+                            <input type="number" id="typo-hero-size" value="10" min="1" max="20" step="0.5" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>굵기</label>
+                            <select id="typo-hero-weight" onchange="AdminPanel.updateTypographyPreview()">
+                                <option value="300">Light (300)</option>
+                                <option value="400">Regular (400)</option>
+                                <option value="500">Medium (500)</option>
+                                <option value="600">SemiBold (600)</option>
+                                <option value="700">Bold (700)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>자간 (px)</label>
+                            <input type="number" id="typo-hero-spacing" value="5" min="-5" max="30" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>행간</label>
+                            <input type="number" id="typo-hero-line" value="0.95" min="0.5" max="3" step="0.05" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Subtitle Typography -->
+                <div class="typography-group">
+                    <h3>히어로 서브타이틀</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>폰트</label>
+                            <select id="typo-subtitle-font" onchange="AdminPanel.updateTypographyPreview()">
+                                <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+                                <option value="'Montserrat', sans-serif">Montserrat</option>
+                                <option value="'Rocket', 'Noto Sans KR', sans-serif">로케트체</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>크기 (rem)</label>
+                            <input type="number" id="typo-subtitle-size" value="1.2" min="0.5" max="5" step="0.1" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>굵기</label>
+                            <select id="typo-subtitle-weight" onchange="AdminPanel.updateTypographyPreview()">
+                                <option value="300">Light (300)</option>
+                                <option value="400">Regular (400)</option>
+                                <option value="500">Medium (500)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>자간 (px)</label>
+                            <input type="number" id="typo-subtitle-spacing" value="2" min="-5" max="20" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Greeting Text Typography -->
+                <div class="typography-group">
+                    <h3>인사말 텍스트</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>폰트</label>
+                            <select id="typo-greeting-font" onchange="AdminPanel.updateTypographyPreview()">
+                                <option value="'Rocket', 'Noto Sans KR', sans-serif">로케트체</option>
+                                <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+                                <option value="'Montserrat', sans-serif">Montserrat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>크기 (rem)</label>
+                            <input type="number" id="typo-greeting-size" value="3" min="1" max="8" step="0.1" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>굵기</label>
+                            <select id="typo-greeting-weight" onchange="AdminPanel.updateTypographyPreview()">
+                                <option value="normal">Normal</option>
+                                <option value="300">Light (300)</option>
+                                <option value="400">Regular (400)</option>
+                                <option value="500">Medium (500)</option>
+                                <option value="700">Bold (700)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>자간 (px)</label>
+                            <input type="number" id="typo-greeting-spacing" value="0" min="-5" max="20" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>행간</label>
+                            <input type="number" id="typo-greeting-line" value="1.8" min="1" max="4" step="0.1" onchange="AdminPanel.updateTypographyPreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 미리보기 -->
+                <div class="section-header" style="margin-top: 40px;">
+                    <h3>미리보기</h3>
+                </div>
+                <div class="preview-box typography-preview" id="typography-preview">
+                    <div class="preview-title-text" id="preview-typo-title">CREATIVE<br>VISUAL<br>STORYTELLER</div>
+                    <div class="preview-subtitle-text" id="preview-typo-subtitle">영상으로 이야기를 전하는 크리에이터</div>
+                    <hr style="border-color: #333; margin: 30px 0;">
+                    <div class="preview-greeting-text" id="preview-typo-greeting">변화하는 미디어 시대에<br>가장 창의적인 콘텐츠를 만듭니다</div>
+                </div>
+            </section>
+            <!-- Visitors Section -->
+            <section id="visitors" class="admin-section">
+                <div class="section-header">
+                    <h2>방문기록</h2>
+                    <div class="visitor-header-actions">
+                        <button class="btn-save" onclick="AdminPanel.refreshVisitors()">새로고침</button>
+                        <button class="btn-delete" onclick="AdminPanel.clearVisitors()">기록 삭제</button>
+                    </div>
+                </div>
+                <p class="section-desc">내 IP를 제외한 외부 방문 기록입니다.</p>
+
+                <!-- 내 IP 설정 -->
+                <div class="visitor-my-ip-box">
+                    <label>내 IP 주소</label>
+                    <div class="visitor-ip-row">
+                        <input type="text" id="my-ip-address" placeholder="자동 감지 또는 직접 입력" readonly>
+                        <button class="btn-edit" onclick="AdminPanel.detectMyIP()">자동 감지</button>
+                        <button class="btn-edit" onclick="AdminPanel.enableMyIPEdit()">수동 입력</button>
+                        <button class="btn-save" onclick="AdminPanel.saveMyIP()">저장</button>
+                    </div>
+                </div>
+
+                <!-- 통계 요약 -->
+                <div class="visitor-stats-row" id="visitor-stats">
+                    <div class="visitor-stat-card">
+                        <span class="stat-number" id="visitor-total">0</span>
+                        <span class="stat-label">전체 방문</span>
+                    </div>
+                    <div class="visitor-stat-card">
+                        <span class="stat-number" id="visitor-unique">0</span>
+                        <span class="stat-label">고유 IP</span>
+                    </div>
+                    <div class="visitor-stat-card">
+                        <span class="stat-number" id="visitor-today">0</span>
+                        <span class="stat-label">오늘 방문</span>
+                    </div>
+                    <div class="visitor-stat-card">
+                        <span class="stat-number" id="visitor-device-mobile">0</span>
+                        <span class="stat-label">모바일</span>
+                    </div>
+                </div>
+
+                <!-- 방문기록 테이블 -->
+                <div class="visitor-table-wrap">
+                    <table class="visitor-table">
+                        <thead>
+                            <tr>
+                                <th>시간</th>
+                                <th>IP</th>
+                                <th>지역</th>
+                                <th>브라우저</th>
+                                <th>디바이스</th>
+                                <th>화면</th>
+                                <th>유입경로</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitor-table-body">
+                            <tr><td colspan="7" class="visitor-empty">방문기록이 없습니다.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Work Modal -->
+    <div class="modal" id="work-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="work-modal-title">작품 추가</h3>
+                <button class="modal-close" onclick="AdminPanel.closeWorkModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="work-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>카테고리 (영문)</label>
+                        <input type="text" id="work-category" placeholder="video-editing">
+                    </div>
+                    <div class="form-group">
+                        <label>카테고리 라벨 (표시용)</label>
+                        <input type="text" id="work-categoryLabel" placeholder="VIDEO EDITING">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>제목</label>
+                        <input type="text" id="work-title" placeholder="프로젝트 제목">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>설명</label>
+                        <textarea id="work-description" rows="3" placeholder="프로젝트 설명"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>썸네일 이미지</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="work-thumbnail" placeholder="assets/images/work-1.jpg">
+                            <label class="btn-upload">
+                                파일 선택
+                                <input type="file" accept="image/*" onchange="AdminPanel.handleFileUpload(this, 'work-thumbnail', 'images')">
+                            </label>
+                        </div>
+                        <div class="image-preview" id="work-thumbnail-preview"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>비디오 파일 (선택)</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="work-videoUrl" placeholder="assets/videos/works/example.mp4">
+                            <label class="file-upload-btn">
+                                파일 선택
+                                <input type="file" accept="video/*" onchange="AdminPanel.handleFileUpload(this, 'work-videoUrl', 'videos/works')">
+                            </label>
+                        </div>
+                        <small style="color: var(--admin-text-muted); font-size: 0.8rem;">비디오 파일을 assets/videos/works/ 폴더에 업로드하세요</small>
+                    </div>
+                    <div class="form-group">
+                        <label>링크 URL</label>
+                        <input type="text" id="work-link" placeholder="#">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="work-featured"> 대형 표시 (Featured)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="AdminPanel.closeWorkModal()">취소</button>
+                <button class="btn-save" onclick="AdminPanel.saveWork()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Slide Modal -->
+    <div class="modal" id="hero-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="hero-modal-title">슬라이드 추가</h3>
+                <button class="modal-close" onclick="AdminPanel.closeHeroModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hero-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>타입</label>
+                        <select id="hero-type">
+                            <option value="video">비디오</option>
+                            <option value="image">이미지</option>
+                            <option value="youtube">YouTube</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>소스 (비디오/이미지)</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="hero-src" placeholder="assets/videos/hero-video.mp4 또는 YouTube URL">
+                            <label class="btn-upload">
+                                파일 선택
+                                <input type="file" accept="video/*,image/*" onchange="AdminPanel.handleFileUpload(this, 'hero-src', 'auto')">
+                            </label>
+                        </div>
+                        <div class="image-preview" id="hero-src-preview"></div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>포스터 이미지 (비디오용)</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="hero-poster" placeholder="assets/images/poster.jpg">
+                            <label class="btn-upload">
+                                파일 선택
+                                <input type="file" accept="image/*" onchange="AdminPanel.handleFileUpload(this, 'hero-poster', 'images')">
+                            </label>
+                        </div>
+                        <div class="image-preview" id="hero-poster-preview"></div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>타이틀 (선택)</label>
+                        <input type="text" id="hero-title" placeholder="슬라이드 타이틀">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>서브타이틀 (선택)</label>
+                        <input type="text" id="hero-subtitle" placeholder="슬라이드 서브타이틀">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="AdminPanel.closeHeroModal()">취소</button>
+                <button class="btn-save" onclick="AdminPanel.saveHeroSlide()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Channel Modal -->
+    <div class="modal" id="channel-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="channel-modal-title">채널 추가</h3>
+                <button class="modal-close" onclick="AdminPanel.closeChannelModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="channel-id">
+                <div class="form-grid">
+                    <!-- YouTube 채널 URL로 자동 추가 -->
+                    <div class="form-group full-width" id="channel-url-group">
+                        <label>YouTube 채널 URL (선택사항)</label>
+                        <div class="input-with-button">
+                            <input type="url" id="channel-youtube-url" placeholder="https://www.youtube.com/@channelname">
+                            <button type="button" class="btn-auto-thumb" onclick="AdminPanel.fetchYoutubeChannelInfo()">채널 정보 가져오기</button>
+                        </div>
+                        <small class="form-hint">채널 URL을 입력하면 이름과 로고를 자동으로 가져옵니다</small>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>채널 이름</label>
+                        <input type="text" id="channel-name" placeholder="CONTENTS">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>채널 설명</label>
+                        <textarea id="channel-description" rows="2" placeholder="채널에 대한 설명"></textarea>
+                    </div>
+                    <!-- 그룹 채널 옵션 -->
+                    <div class="form-group full-width">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="channel-isGroup" onchange="AdminPanel.toggleGroupOptions()">
+                            <span>그룹 채널 (하위 채널 포함)</span>
+                        </label>
+                        <small class="form-hint">엔터테인먼트, MCN 등 여러 채널을 운영하는 그룹</small>
+                    </div>
+                    <!-- 그룹 채널 전용 옵션 -->
+                    <div id="group-options" class="group-options-container" style="display: none;">
+                        <div class="form-group full-width">
+                            <label>그룹 설명 (채널 페이지에 표시)</label>
+                            <textarea id="channel-groupDescription" rows="3" placeholder="그룹에 대한 상세 설명을 입력하세요"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>하위 채널 목록</label>
+                            <div id="subchannels-list" class="subchannels-list"></div>
+                            <button type="button" class="btn-add-subchannel" onclick="AdminPanel.addSubChannelRow()">+ 하위 채널 추가</button>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>채널 로고</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="channel-logo" placeholder="assets/images/channel-logo.jpg">
+                            <label class="btn-upload">
+                                파일 선택
+                                <input type="file" accept="image/*" onchange="AdminPanel.handleFileUpload(this, 'channel-logo', 'images')">
+                            </label>
+                        </div>
+                        <div class="image-preview" id="channel-logo-preview"></div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>구독자 수</label>
+                        <input type="text" id="channel-subscribers" placeholder="예: 100만, 35만, 1.2만, 8500">
+                        <small class="form-hint">한글 또는 숫자로 입력 (예: 100만, 35만, 12000)</small>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>YouTube 채널 링크 (채널 페이지 이동용)</label>
+                        <input type="url" id="channel-link" placeholder="https://www.youtube.com/@channelname">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="AdminPanel.closeChannelModal()">취소</button>
+                <button class="btn-save" onclick="AdminPanel.saveChannel()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Channel Video Modal -->
+    <div class="modal" id="channel-video-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="channel-video-modal-title">영상 추가</h3>
+                <button class="modal-close" onclick="AdminPanel.closeChannelVideoModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="channel-video-channel-id">
+                <input type="hidden" id="channel-video-id">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>YouTube URL</label>
+                        <div class="input-with-button">
+                            <input type="url" id="channel-video-youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                            <button type="button" class="btn-auto-thumb" onclick="AdminPanel.autoFillYoutubeInfo()">정보 자동입력</button>
+                        </div>
+                        <small class="form-hint">URL 입력 후 버튼 클릭 시 제목과 썸네일이 자동으로 입력됩니다</small>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>영상 제목</label>
+                        <input type="text" id="channel-video-title" placeholder="자동 입력됩니다">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>썸네일 이미지 (비워두면 YouTube 썸네일 자동 사용)</label>
+                        <div class="file-upload-group">
+                            <input type="text" id="channel-video-thumbnail" placeholder="자동: YouTube 썸네일">
+                            <label class="btn-upload">
+                                파일 선택
+                                <input type="file" accept="image/*" onchange="AdminPanel.handleFileUpload(this, 'channel-video-thumbnail', 'images')">
+                            </label>
+                        </div>
+                        <div class="image-preview" id="channel-video-thumbnail-preview"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="AdminPanel.closeChannelVideoModal()">취소</button>
+                <button class="btn-save" onclick="AdminPanel.saveChannelVideo()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deploy Export Modal -->
+    <div class="modal" id="deploy-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>🚀 배포용 데이터 내보내기</h3>
+                <button class="modal-close" onclick="AdminPanel.closeDeployModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="deploy-warnings" style="display:none; margin-bottom: 15px;"></div>
+                <div class="deploy-instructions">
+                    <h4>📋 사용 방법</h4>
+                    <ol>
+                        <li><strong>📥 data.js 다운로드</strong> 버튼 클릭</li>
+                        <li>다운로드된 <code>data.js</code> 파일을 프로젝트의 <code>js/</code> 폴더에 덮어쓰기</li>
+                        <li>Netlify에 배포</li>
+                    </ol>
+                    <p class="deploy-tip" style="color: #38ef7d; margin-top: 10px;">💡 이미지가 안 보이면 <strong>🔄 파일 동기화</strong> 버튼을 먼저 눌러보세요!</p>
+                </div>
+                <div class="deploy-code-container">
+                    <button class="btn-copy-code" onclick="AdminPanel.copyDeployCode()">📋 코드 복사</button>
+                    <pre id="deploy-code-output"></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="AdminPanel.closeDeployModal()">닫기</button>
+                <button class="btn-save" onclick="AdminPanel.downloadDeployFile()">📥 data.js 다운로드</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
